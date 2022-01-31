@@ -120,13 +120,13 @@ print(paste0("la correlación entre temperatura y humedad en el aeropuerto LGA e
 cor(cumpleanosJFK$temp,cumpleanosJFK$humid)
 print(paste0("la correlación entre temperatura y humedad en el aeropuerto JFK el día de mi cumpleaños fue ",cor(cumpleanosJFK$temp,cumpleanosJFK$humid), " lo que indica que las dos variables están asociadas en sentido inverso"))
 
- ggplot(data = JFK) + 
+ ggplot(data = cumpleanosJFK) + 
   geom_point(mapping = aes(x = humid, y = temp)) + xlab("Humedad") + ylab("Temperatura")
 
-ggplot(data = EWR) + 
+ggplot(data = cumpleanosEWR) + 
   geom_point(mapping = aes(x = humid, y = temp,)) + xlab("Humedad") + ylab("Temperatura")
 
- ggplot(data = LGA) + 
+ ggplot(data = cumpleanosLGA) + 
   geom_point(mapping = aes(x = humid, y = temp)) + xlab("Humedad") + ylab("Temperatura")
 
 ```
