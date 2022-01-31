@@ -64,20 +64,11 @@ media_wind_gust <- aggregate(tiempo_completo$wind_gust, list(tiempo_completo$mon
 names(media_wind_gust) <- c("mes", "media wind_gust")
 media_wind_gust
 
-EWR <- tiempo[tiempo$origin=="EWR",]
-JFK <- tiempo[tiempo$origin=="JFK",]
-numero_casos <- function(columna){
-  b <- sum(is.na(columna)==FALSE)
-  return(b)
-}
-
-numero_casos(EWR$wind_gust)
-numero_casos(EWR$wind_speed)
-numero_casos(LGA$wind_gust)
-numero_casos(LGA$wind_speed)
-numero_casos(JFK$wind_gust)
-numero_casos(JFK$wind_speed)
+nrow(tiempo_completo)
 ```
+
+En las tablas anteriores podemos observar la media de la velocidad del viento para cada mes, así como, la media de la velocidad de las ráfagas de viento. 
+Además, el número de casos es 4980.
 
 #### 3. Intenta hacer este plot:
 
