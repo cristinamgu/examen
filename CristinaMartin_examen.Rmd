@@ -20,10 +20,13 @@ library(ggplot2)
 
 ##### a. ¿Cuántas palabras hay en el fichero?
 cat genes.txt | wc -w
+
 ##### b. ¿Cómo cambiarías todos los tabulados por guiones?
 cat genes.txt | sed 's/\t/-/g'
+
 ##### c. ¿Cómo cambiarías solo la primera aparición?
 cat genes.txt | sed 's/\t/-/' 
+
 ##### d. ¿Cómo buscarías todos los genes excepto el gen llamado DSTYK?
 cat genes.txt | grep -v DSTYK 
 
@@ -64,7 +67,7 @@ media_wind_gust <- aggregate(tiempo_completo$wind_gust, list(tiempo_completo$mon
 names(media_wind_gust) <- c("mes", "media wind_gust")
 media_wind_gust
 
-numerocasos <- nrow(tiempo_completo)
+nrow(tiempo_completo)
 ```
 
 En las tablas anteriores podemos observar la media de la velocidad del viento para cada mes, así como, la media de la velocidad de las ráfagas de viento. 
@@ -75,6 +78,9 @@ Además, el número de casos es 4980.
 ##### Crea el plot anterior. Crea una función que plotee el plot anterior.Como argumentos se podrán introducir: el nombre de la columna de interés, el título y las unidades.La función debe devolver un vector con 3 valores. Estos valores serán la media de cada uno de los lugares.Por pantalla también tendrá que aparecer la media mediante un print.
 
 ```{r}
+EWR <- tiempo[tiempo$origin == "EWR",]
+JFK <- tiempo[tiempo$origin == "JFK",]
+
 plot_meteo <- function(data,columna,titulo,unidades)
   {
   dat <- data.frame(data)
@@ -146,7 +152,7 @@ Csn1s2b es el gen más significativo de los sobreexpresados y se encuentra down 
 
 #### 6. Sube el examen a github y escribe a continuación tu url aquí.
 
-
+https://github.com/cristinamgu/examen.git
 
 #### 7. Acaba el documento con el comando sessionInfo()
 
