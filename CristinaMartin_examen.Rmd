@@ -1,0 +1,165 @@
+---
+title: "Examen"
+author: "Cristina Martin"
+date: "1/31/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(nycflights13)
+tiempo <- nycflights13::weather
+library(tidyverse)
+library(ggplot2)
+```
+
+#### 1. Comandos de Linux. Tengo un fichero llamado genes.txt con 3 columnas: Nombre_ de_ gen, cromosoma y posición. Separados por tabulados. ¿Qué comando utilizarías para saber?:
+
+##### a. ¿Cuántas palabras hay en el fichero?
+cat genes.txt | wc -w
+##### b. ¿Cómo cambiarías todos los tabulados por guiones?
+cat genes.txt | sed 's/\t/-/g'
+##### c. ¿Cómo cambiarías solo la primera aparición?
+cat genes.txt | sed 's/\t/-/' 
+##### d. ¿Cómo buscarías todos los genes excepto el gen llamado DSTYK?
+cat genes.txt | grep -v DSTYK 
+
+#### 2. Preguntas básicas:
+
+##### a. ¿Cuántas columnas y cuántos registros tiene este dataset?
+
+```{r}
+ncol(tiempo)
+nrow(tiempo)
+```
+
+##### b. ¿Cuántos “origin” diferentes existen y para cada uno de ellos cuántos registros hay?
+
+```{r}
+table(tiempo$origin)
+```
+
+Hay tres origenes diferentes EWR con 8703 registros, JFK con 8706 registros y LGA con 8706 registros.
+
+##### c. En LGA, ¿cuáles fueron la mediana del wind_speed y media de pressure?
+
+```{r}
+LGA <- tiempo[tiempo$origin== "LGA",]
+mean(LGA$pressure, na.rm = T)
+median(LGA$wind_speed, na.rm = T)
+```
+
+##### d. Después de eliminar los NA de la columna wind_gust, calcula para cada mes la media de wind_speed y wind_gust, y el número de casos.
+
+```{r}
+tiempo_completo <- tiempo[complete.cases(tiempo),]
+media_wind_speed <- aggregate(tiempo_completo$wind_speed, list(tiempo_completo$month), mean)
+names(media_wind_speed) <- c("mes", "media wind_speed")
+media_wind_speed
+
+media_wind_gust <- aggregate(tiempo_completo$wind_gust, list(tiempo_completo$month), mean)
+names(media_wind_gust) <- c("mes", "media wind_gust")
+media_wind_gust
+
+EWR <- tiempo[tiempo$origin=="EWR",]
+JFK <- tiempo[tiempo$origin=="JFK",]
+numero_casos <- function(columna){
+  b <- sum(is.na(columna)==FALSE)
+  return(b)
+}
+
+numero_casos(EWR$wind_gust)
+numero_casos(EWR$wind_speed)
+numero_casos(LGA$wind_gust)
+numero_casos(LGA$wind_speed)
+numero_casos(JFK$wind_gust)
+numero_casos(JFK$wind_speed)
+```
+
+#### 3. Intenta hacer este plot:
+
+##### Crea el plot anterior. Crea una función que plotee el plot anterior.Como argumentos se podrán introducir: el nombre de la columna de interés, el título y las unidades.La función debe devolver un vector con 3 valores. Estos valores serán la media de cada uno de los lugares.Por pantalla también tendrá que aparecer la media mediante un print.
+
+```{r}
+plot_meteo <- function(data,columna,titulo,unidades)
+  {
+  dat <- data.frame(data)
+  x <- dat[,columna]
+   boxplot(x ~ dat$month, type ="l", ylab = unidades, xlab= "Months",col="lightblue", main = titulo)
+ media <- c(mean(EWR$temp,na.rm=T),mean(LGA$temp,na.rm=T),mean(JFK$temp,na.rm=T))
+    
+ return(media)
+ print(media)
+}
+
+plot_meteo(EWR,"temp","EWR","ºC")
+plot_meteo(JFK,"temp","JFK","ºC")
+plot_meteo(LGA,"temp","LGA","ºC")
+
+plot_meteo(tiempo,"humid", "Humedad","Relative humidity")
+
+```
+
+#### 4. El día de tu cumpleaños:
+
+##### a. Qué correlación tuvieron la temperatura y humedad en cada uno de los origin? Plotealo mediante puntos con ggplot.
+
+```{r}
+dia_cumple <- filter(tiempo, day == 4)
+cumpleanos <- filter(dia_cumple, month == 2)
+cumpleanosEWR <- filter(cumpleanos, origin=="EWR")
+cumpleanosLGA <- filter(cumpleanos, origin=="LGA")
+cumpleanosJFK <- filter(cumpleanos, origin=="JFK")
+
+cor(cumpleanosEWR$temp,cumpleanosEWR$humid)
+print(paste0("la correlación entre temperatura y humedad en el aeropuerto EWR el día de mi cumpleaños fue ", cor(cumpleanosEWR$temp,cumpleanosEWR$humid), " lo que indica que las dos variables están asociadas en sentido inverso"))
+
+cor(cumpleanosLGA$temp,cumpleanosLGA$humid)
+print(paste0("la correlación entre temperatura y humedad en el aeropuerto LGA el día de mi cumpleaños fue ",cor(cumpleanosLGA$temp,cumpleanosLGA$humid) , " lo que indica que las dos variables están asociadas en sentido inverso"))
+
+cor(cumpleanosJFK$temp,cumpleanosJFK$humid)
+print(paste0("la correlación entre temperatura y humedad en el aeropuerto JFK el día de mi cumpleaños fue ",cor(cumpleanosJFK$temp,cumpleanosJFK$humid), " lo que indica que las dos variables están asociadas en sentido inverso"))
+
+ ggplot(data = JFK) + 
+  geom_point(mapping = aes(x = humid, y = temp)) + xlab("Humedad") + ylab("Temperatura")
+
+ggplot(data = EWR) + 
+  geom_point(mapping = aes(x = humid, y = temp,)) + xlab("Humedad") + ylab("Temperatura")
+
+ ggplot(data = LGA) + 
+  geom_point(mapping = aes(x = humid, y = temp)) + xlab("Humedad") + ylab("Temperatura")
+
+```
+
+##### b. Si comparas la temperatura en los origins JFK y LGA ¿son estadísticamente diferentes? ¿Qué p-valor consigues? Plotea los boxplots.
+
+```{r}
+cumpleanos_JFKyLGA <- filter(cumpleanos, origin=="JFK" | origin == "LGA")
+boxplot(cumpleanos_JFKyLGA$temp ~ cumpleanos_JFKyLGA$origin, ylab = "temp", xlab = "origen", col = "green")
+t.test(cumpleanos_JFKyLGA$temp ~ cumpleanos_JFKyLGA$origin)
+
+```
+
+No hay diferencias estadisticamente significativas entre las temperaturas en los aeropuertos JFK y LGA el día de mi cumpleaños.
+
+#### 5.Observa la siguiente imagen.
+
+##### a. ¿Cuál es el punto con FC (Fold change) más grande en valores absolutos?
+El punto al que corresponde el FC más grande en valor absoluto es el que se situa en el eje de la Y a la altura del número 5 (color morado) y que en el eje de la X marcaría alrededor de 8/9 en valor absoluto.
+
+##### b. ¿Qué gen sobreexpresado es el más significativo?
+Csn1s2b es el gen más significativo de los sobreexpresados y se encuentra down regulado.
+
+#### 6. Sube el examen a github y escribe a continuación tu url aquí.
+
+
+
+#### 7. Acaba el documento con el comando sessionInfo()
+
+```{r}
+
+```
+
